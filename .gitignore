@@ -53,3 +53,7 @@ node_modules/
 env/
 .venv/
 venv/
+
+.clangd
+compile_commands.json
+.cache
