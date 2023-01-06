@@ -11,6 +11,7 @@
 #include <arch_helpers.h>
 #include <common/debug.h>
 #include <plat_startup.h>
+#include <platform_def.h>
 
 
 /*

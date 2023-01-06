@@ -67,10 +67,12 @@ static inline void bl31_set_default_config(void)
 void bl31_early_platform_setup2(u_register_t arg0, u_register_t arg1,
 				u_register_t arg2, u_register_t arg3)
 {
+#ifndef VERSAL_VIRT_PLATFORM
 	uint64_t atf_handoff_addr;
 	uint32_t payload[PAYLOAD_ARG_CNT], max_size = ATF_HANDOFF_PARAMS_MAX_SIZE;
 	enum pm_ret_status ret_status;
 	uint64_t addr[ATF_HANDOFF_PARAMS_MAX_SIZE];
+#endif
 
 	if (VERSAL_CONSOLE_IS(pl011) || (VERSAL_CONSOLE_IS(pl011_1))) {
 		static console_t versal_runtime_console;
@@ -114,6 +116,9 @@ void bl31_early_platform_setup2(u_register_t arg0, u_register_t arg1,
 	SET_PARAM_HEAD(&bl33_image_ep_info, PARAM_EP, VERSION_1, 0);
 	SET_SECURITY_STATE(bl33_image_ep_info.h.attr, NON_SECURE);
 
+#ifdef VERSAL_VIRT_PLATFORM
+	bl31_set_default_config();
+#else
 	PM_PACK_PAYLOAD4(payload, LOADER_MODULE_ID, 1, PM_LOAD_GET_HANDOFF_PARAMS,
 			(uintptr_t)addr >> 32U, (uintptr_t)addr, max_size);
 	ret_status = pm_ipi_send_sync(primary_proc, payload, NULL, 0);
@@ -137,6 +142,7 @@ void bl31_early_platform_setup2(u_register_t arg0, u_register_t arg1,
 	} else {
 		INFO("BL31: fsbl-atf handover success %u\n", ret);
 	}
+#endif
 
 	NOTICE("BL31: Secure code at 0x%lx\n", bl32_image_ep_info.pc);
 	NOTICE("BL31: Non secure code at 0x%lx\n", bl33_image_ep_info.pc);
@@ -215,8 +221,10 @@ void bl31_plat_runtime_setup(void)
  */
 void bl31_plat_arch_setup(void)
 {
+#ifndef VERSAL_VIRT_PLATFORM
 	plat_arm_interconnect_init();
 	plat_arm_interconnect_enter_coherency();
+#endif
 
 	const mmap_region_t bl_regions[] = {
 		MAP_REGION_FLAT(BL31_BASE, BL31_END - BL31_BASE,
