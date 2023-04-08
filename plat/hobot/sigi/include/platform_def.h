@@ -1,0 +1,229 @@
+/*
+ * Copyright (c) 2018-2020, ARM Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+#ifndef PLATFORM_DEF_H
+#define PLATFORM_DEF_H
+
+#include <lib/utils_def.h>
+#include <plat/common/common_def.h>
+
+/* CPU topology */
+#define PLAT_MAX_CORES_PER_CLUSTER	U(4)
+#define PLAT_CLUSTER_COUNT		U(4)
+#define PLATFORM_CORE_COUNT		(PLAT_CLUSTER_COUNT * PLAT_MAX_CORES_PER_CLUSTER)
+
+#define PLAT_MAX_PWR_LVL		U(1)
+#define PLAT_MAX_RET_STATE		U(1)
+#define PLAT_MAX_OFF_STATE		U(2)
+
+/* Local power state for power domains in Run state. */
+#define SIGI_LOCAL_STATE_RUN		U(0)
+/* Local power state for retention. Valid only for CPU power domains */
+#define SIGI_LOCAL_STATE_RET		U(1)
+/*
+ * Local power state for OFF/power-down. Valid for CPU and cluster power
+ * domains.
+ */
+#define SIGI_LOCAL_STATE_OFF		2
+
+/*
+ * Macros used to parse state information from State-ID if it is using the
+ * recommended encoding for State-ID.
+ */
+#define SIGI_LOCAL_PSTATE_WIDTH		4
+#define SIGI_LOCAL_PSTATE_MASK		((1 << SIGI_LOCAL_PSTATE_WIDTH) - 1)
+
+#define CACHE_WRITEBACK_SHIFT		6
+#define CACHE_WRITEBACK_GRANULE		(1 << CACHE_WRITEBACK_SHIFT)
+
+/* xlat table v2 related to contants */
+#define PLAT_PHY_ADDR_SPACE_SIZE	(1ULL << 40)
+#define PLAT_VIRT_ADDR_SPACE_SIZE	(1ULL << 40)
+#define MAX_XLAT_TABLES			8
+#define MAX_MMAP_REGIONS		8
+
+#define PLATFORM_STACK_SIZE		0x1000
+
+/* physical memory related constants */
+#define SIGI_INTERLEAVE_DRAM_BASE	0x1000000000UL
+#define SIGI_NON_INTER_DRAM_BASE	0x3000000000UL
+#define SIGI_NS_DDR_SIZE			(ULL(0x10) * SZ_1G)
+#define SIGI_BL33_IMAGE_OFFSET		0x4000000
+#define SIGI_BL33_DTB_OFFSET		0x2000000
+
+#define SIGI_OCM_BASE		0x04000000
+#define SIGI_OCM_SIZE		SZ_32M
+
+/*
+ * ARM-TF lives in SRAM, partition it here
+ */
+
+#define SHARED_RAM_BASE			SIGI_OCM_BASE
+#define SHARED_RAM_SIZE			SZ_4K
+
+#define SEC_SRAM_BASE		(SHARED_RAM_BASE + SHARED_RAM_SIZE)
+#define SEC_SRAM_SIZE		SZ_512K
+
+#define PLAT_SIGI_TRUSTED_MAILBOX_BASE	SHARED_RAM_BASE
+#define PLAT_SIGI_TRUSTED_MAILBOX_SIZE	(8 + PLAT_SIGI_HOLD_SIZE)
+#define PLAT_SIGI_HOLD_BASE		(PLAT_SIGI_TRUSTED_MAILBOX_BASE + 8)
+#define PLAT_SIGI_HOLD_SIZE		(PLATFORM_CORE_COUNT * \
+					 PLAT_SIGI_HOLD_ENTRY_SIZE)
+#define PLAT_SIGI_HOLD_ENTRY_SHIFT	3
+#define PLAT_SIGI_HOLD_ENTRY_SIZE	(1 << PLAT_SIGI_HOLD_ENTRY_SHIFT)
+#define PLAT_SIGI_HOLD_STATE_WAIT	0
+#define PLAT_SIGI_HOLD_STATE_GO		1
+
+/*
+ * BL3-1 specific defines.
+ *
+ * Put BL3-1 at the top of the Trusted SRAM. BL31_BASE is calculated using the
+ * current BL3-1 debug size plus a little space for growth.
+ */
+#define BL31_BASE			SEC_SRAM_BASE
+#define BL31_SIZE			(BL31_LIMIT - BL31_BASE)
+#define BL31_LIMIT			(BL31_BASE + SZ_512K)
+
+#define BL32_BASE			(SIGI_OCM_BASE + BL31_SIZE)
+#define BL32_SIZE			SZ_1M
+#define BL32_LIMIT			(BL32_BASE + BL32_SIZE)
+
+/*******************************************************************************
+ * BL33 specific defines.
+ ******************************************************************************/
+#ifndef PRELOADED_BL33_BASE
+# define PLAT_ARM_NS_IMAGE_BASE	U(SIGI_NON_INTER_DRAM_BASE + SIGI_BL33_IMAGE_OFFSET)
+# define PLAT_ARM_NS_DTB_BASE	U(SIGI_NON_INTER_DRAM_BASE + SIGI_BL33_DTB_OFFSET)
+#else
+# define PLAT_ARM_NS_IMAGE_BASE	PRELOADED_BL33_BASE
+#endif
+
+/*
+ * UART related constants
+ */
+#define PLAT_SIGI_BOOT_UART_BASE	0x39050000
+#define PLAT_SIGI_BOOT_UART_CLK_IN_HZ	SIGI_UART0_CLK_IN_HZ
+#define PLAT_SIGI_CONSOLE_BAUDRATE		SIGI_UART0_BAUDRATE
+
+#define PLAT_SIGI_UART1_BASE		PLAT_SIGI_BOOT_UART_BASE
+#define PLAT_SIGI_UART1_SIZE		ULL(0x1000)
+#define PLAT_SIGI_UART1_MMAP		MAP_REGION_FLAT(PLAT_SIGI_UART1_BASE, \
+											PLAT_SIGI_UART1_SIZE, \
+											MT_DEVICE | MT_RW | \
+											MT_NS | MT_PRIVILEGED)
+
+#define DEVICE0_BASE			0x10000000
+#define DEVICE0_SIZE			0x1C000000
+#define DEVICE1_BASE			0x30000000
+#define DEVICE1_SIZE			0x10000000
+
+/*
+ * GIC related constants
+ */
+
+#define GICD_BASE			0x30B00000
+#define GICC_BASE			0x30B10000
+#define GICR_BASE			0x30B60000
+
+#define SIGI_IRQ_SEC_SGI_0		8
+#define SIGI_IRQ_SEC_SGI_1		9
+#define SIGI_IRQ_SEC_SGI_2		10
+#define SIGI_IRQ_SEC_SGI_3		11
+#define SIGI_IRQ_SEC_SGI_4		12
+#define SIGI_IRQ_SEC_SGI_5		13
+#define SIGI_IRQ_SEC_SGI_6		14
+#define SIGI_IRQ_SEC_SGI_7		15
+
+#define PLATFORM_G1S_PROPS(grp)						\
+	INTR_PROP_DESC(SIGI_IRQ_SEC_SGI_0, GIC_HIGHEST_SEC_PRIORITY,	\
+					   grp, GIC_INTR_CFG_EDGE),	\
+	INTR_PROP_DESC(SIGI_IRQ_SEC_SGI_1, GIC_HIGHEST_SEC_PRIORITY,	\
+					   grp, GIC_INTR_CFG_EDGE),	\
+	INTR_PROP_DESC(SIGI_IRQ_SEC_SGI_2, GIC_HIGHEST_SEC_PRIORITY,	\
+					   grp, GIC_INTR_CFG_EDGE),	\
+	INTR_PROP_DESC(SIGI_IRQ_SEC_SGI_3, GIC_HIGHEST_SEC_PRIORITY,	\
+					   grp, GIC_INTR_CFG_EDGE),	\
+	INTR_PROP_DESC(SIGI_IRQ_SEC_SGI_4, GIC_HIGHEST_SEC_PRIORITY,	\
+					   grp, GIC_INTR_CFG_EDGE),	\
+	INTR_PROP_DESC(SIGI_IRQ_SEC_SGI_5, GIC_HIGHEST_SEC_PRIORITY,	\
+					   grp, GIC_INTR_CFG_EDGE),	\
+	INTR_PROP_DESC(SIGI_IRQ_SEC_SGI_6, GIC_HIGHEST_SEC_PRIORITY,	\
+					   grp, GIC_INTR_CFG_EDGE),	\
+	INTR_PROP_DESC(SIGI_IRQ_SEC_SGI_7, GIC_HIGHEST_SEC_PRIORITY,	\
+					   grp, GIC_INTR_CFG_EDGE)
+
+#define PLATFORM_G0_PROPS(grp)
+
+#define PLAT_SIGI_MHU_BASE		0x45000000
+
+#define PLAT_SIGI_SCP_COM_SHARED_MEM_BASE		0x45400000
+#define SCPI_CMD_GET_DRAMINFO			0x1
+
+#define PLAT_SIGI_PRIMARY_CPU 0x0
+#define PLAT_SIGI_PRIMARY_CPU_SHIFT		8
+#define PLAT_SIGI_PRIMARY_CPU_BIT_WIDTH		6
+
+#define PLAT_SPM_BUF_BASE		(BL32_LIMIT - 32 * PLAT_SPM_BUF_SIZE)
+#define PLAT_SPM_BUF_SIZE		ULL(0x10000)
+#define PLAT_SPM_SPM_BUF_EL0_MMAP	MAP_REGION2(PLAT_SPM_BUF_BASE, \
+						    PLAT_SPM_BUF_BASE, \
+						    PLAT_SPM_BUF_SIZE, \
+						    MT_RO_DATA | MT_SECURE | \
+						    MT_USER, PAGE_SIZE)
+
+#define PLAT_SP_IMAGE_NS_BUF_BASE	BL32_LIMIT
+#define PLAT_SP_IMAGE_NS_BUF_SIZE	ULL(0x200000)
+#define PLAT_SP_IMAGE_NS_BUF_MMAP	MAP_REGION2(PLAT_SP_IMAGE_NS_BUF_BASE, \
+						    PLAT_SP_IMAGE_NS_BUF_BASE, \
+						    PLAT_SP_IMAGE_NS_BUF_SIZE, \
+						    MT_RW_DATA | MT_NS | \
+						    MT_USER, PAGE_SIZE)
+
+#define PLAT_SP_IMAGE_STACK_PCPU_SIZE	ULL(0x10000)
+#define PLAT_SP_IMAGE_STACK_SIZE	(32 * PLAT_SP_IMAGE_STACK_PCPU_SIZE)
+#define PLAT_SP_IMAGE_STACK_BASE	(PLAT_SIGI_SP_HEAP_BASE + PLAT_SIGI_SP_HEAP_SIZE)
+
+#define PLAT_SIGI_SP_IMAGE_SIZE		ULL(0x200000)
+#define PLAT_SIGI_SP_IMAGE_MMAP		MAP_REGION2(BL32_BASE, BL32_BASE, \
+						    PLAT_SIGI_SP_IMAGE_SIZE, \
+						    MT_CODE | MT_SECURE | \
+						    MT_USER, PAGE_SIZE)
+
+#define PLAT_SIGI_SP_HEAP_BASE		(BL32_BASE + PLAT_SIGI_SP_IMAGE_SIZE)
+#define PLAT_SIGI_SP_HEAP_SIZE		ULL(0x800000)
+
+#define PLAT_SIGI_SP_IMAGE_RW_MMAP	MAP_REGION2(PLAT_SIGI_SP_HEAP_BASE, \
+						    PLAT_SIGI_SP_HEAP_BASE, \
+						    (PLAT_SIGI_SP_HEAP_SIZE + \
+						     PLAT_SP_IMAGE_STACK_SIZE), \
+						    MT_RW_DATA | MT_SECURE | \
+						    MT_USER, PAGE_SIZE)
+
+#define PLAT_SIGI_SP_PRIV_BASE		(PLAT_SP_IMAGE_STACK_BASE + \
+					 PLAT_SP_IMAGE_STACK_SIZE)
+#define PLAT_SIGI_SP_PRIV_SIZE		ULL(0x40000)
+
+#define PLAT_SP_PRI			0x20
+#define PLAT_PRI_BITS			2
+#define PLAT_SPM_COOKIE_0		ULL(0)
+#define PLAT_SPM_COOKIE_1		ULL(0)
+
+/* Total number of memory regions with distinct properties */
+#define PLAT_SP_IMAGE_NUM_MEM_REGIONS	6
+
+#define PLAT_SP_IMAGE_MMAP_REGIONS	30
+#define PLAT_SP_IMAGE_MAX_XLAT_TABLES	20
+#define PLAT_SP_IMAGE_XLAT_SECTION_NAME	"sp_xlat_table"
+#define PLAT_SP_IMAGE_BASE_XLAT_SECTION_NAME	"sp_xlat_table"
+
+#define PLAT_SIGI_PERIPH_BASE		0x25000000
+#define PLAT_SIGI_PERIPH_SIZE		ULL(0x4B000000)
+#define PLAT_SIGI_PERIPH_MMAP		MAP_REGION_FLAT(PLAT_SIGI_PERIPH_BASE, \
+							PLAT_SIGI_PERIPH_SIZE, \
+							MT_DEVICE | MT_RW | \
+							MT_NS | MT_USER)
+
+#endif /* PLATFORM_DEF_H */
