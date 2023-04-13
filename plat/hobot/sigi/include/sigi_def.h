@@ -21,5 +21,21 @@
 unsigned int sigi_calc_core_pos(u_register_t mpidr);
 void sigi_console_init(void);
 void plat_sigi_gic_init(void);
+void sigi_pwr_gic_on_finish(void);
+void sigi_pwr_gic_off(void);
+
+/* PMU register offsets for CPU*/
+enum {
+    CPU_CL0_C0_0            = 0x0214,
+    CPU_CL0_C0_1            = 0x0218,
+    CPU_CL0_C1_0            = 0x0220,
+    CPU_CL0_C1_1            = 0x0224,
+    CPU_CL0_C2_0            = 0x022c,
+    CPU_CL0_C2_1            = 0x0230,
+    CPU_CL0_C3_0            = 0x0238,
+    CPU_CL0_C3_1            = 0x023c,
+};
+
+#define SIGI_PMU_BASE	0x23190000U
 
 #endif /* SIGI_DEF_H */

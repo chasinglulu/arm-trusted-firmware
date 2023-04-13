@@ -148,6 +148,7 @@ void bl31_plat_arch_setup(void)
 		MAP_REGION_FLAT(BL_CODE_BASE, BL_CODE_END - BL_CODE_BASE,
 				MT_CODE | MT_SECURE),
 		MAP_REGION_FLAT(BL_RO_DATA_BASE, BL_RO_DATA_END - BL_RO_DATA_BASE, MT_RO_DATA| MT_SECURE),
+		MAP_REGION_FLAT(SHARED_RAM_BASE, SHARED_RAM_SIZE, MT_MEMORY | MT_RW | MT_SECURE),
 		{0}
 	};
 	setup_page_tables(bl_regions, plat_sigi_get_mmap());

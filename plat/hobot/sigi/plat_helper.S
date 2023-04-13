@@ -10,7 +10,6 @@
 #include <platform_def.h>
 
 	.global	sigi_calc_core_pos
-	.globl	plat_get_my_entrypoint
 	.global	plat_my_core_pos
 	.global	platform_mem_init
 	.global	plat_is_my_cpu_primary
@@ -30,6 +29,7 @@ endfunc sigi_calc_core_pos
 
 func plat_my_core_pos
 	mrs	x0, mpidr_el1
+	lsr	x0, x0, #8
 	b	sigi_calc_core_pos
 endfunc plat_my_core_pos
 
@@ -45,12 +45,24 @@ endfunc platform_mem_init
  * code that secondary CPUs jump to.
  */
 func plat_secondary_cold_boot_setup
-	ldr	x0, #0
+	/* Calculate address of our hold entry */
+	bl	plat_my_core_pos
+	lsl	x0, x0, #PLAT_SIGI_HOLD_ENTRY_SHIFT
+	mov_imm	x2, PLAT_SIGI_HOLD_BASE
 
-	/* Wait until the mailbox gets populated */
+	/* Wait until we have a go */
 poll_mailbox:
-	cbz	x0, 1f
-	br	x0
+	ldr	x1, [x2, x0]
+	cbz	x1, 1f
+
+	/* Clear the mailbox again ready for next time. */
+	mov x1, #PLAT_SIGI_HOLD_STATE_WAIT
+	str x1, [x2, x0]
+
+	/* Jump to the provided entrypoint. */
+	mov_imm	x0, PLAT_SIGI_TRUSTED_MAILBOX_BASE
+	ldr	x1, [x0]
+	br	x1
 1:
 	wfe
 	b	poll_mailbox

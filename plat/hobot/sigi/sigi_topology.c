@@ -15,6 +15,8 @@ int plat_core_pos_by_mpidr(u_register_t mpidr)
 {
 	unsigned int cluster_id, cpu_id;
 
+	mpidr >>= 8;
+
 	cluster_id = (mpidr >> MPIDR_AFF1_SHIFT) & MPIDR_AFFLVL_MASK;
 	if (cluster_id >= PLAT_CLUSTER_COUNT)
 		return -1;

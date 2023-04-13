@@ -15,27 +15,31 @@
 #define PLAT_CLUSTER_COUNT		U(4)
 #define PLATFORM_CORE_COUNT		(PLAT_CLUSTER_COUNT * PLAT_MAX_CORES_PER_CLUSTER)
 
-/* Macros to read the SQ power domain state */
-#define SIGI_PWR_LVL0		MPIDR_AFFLVL0
-#define SIGI_PWR_LVL1		MPIDR_AFFLVL1
-#define SIGI_PWR_LVL2		MPIDR_AFFLVL2
-
-#define SIGI_CORE_PWR_STATE(state)	(state)->pwr_domain_state[SIGI_PWR_LVL0]
-#define SIGI_CLUSTER_PWR_STATE(state)	(state)->pwr_domain_state[SIGI_PWR_LVL1]
-#define SIGI_SYSTEM_PWR_STATE(state)	((PLAT_MAX_PWR_LVL > SIGI_PWR_LVL1) ?\
-				(state)->pwr_domain_state[SIGI_PWR_LVL2] : 0)
-
 #define PLAT_MAX_PWR_LVL		U(1)
 #define PLAT_MAX_RET_STATE		U(1)
 #define PLAT_MAX_OFF_STATE		U(2)
 
-#define SIGI_LOCAL_STATE_RUN		0
-#define SIGI_LOCAL_STATE_RET		1
+/* Local power state for power domains in Run state. */
+#define SIGI_LOCAL_STATE_RUN		U(0)
+/* Local power state for retention. Valid only for CPU power domains */
+#define SIGI_LOCAL_STATE_RET		U(1)
+/*
+ * Local power state for OFF/power-down. Valid for CPU and cluster power
+ * domains.
+ */
 #define SIGI_LOCAL_STATE_OFF		2
+
+/*
+ * Macros used to parse state information from State-ID if it is using the
+ * recommended encoding for State-ID.
+ */
+#define SIGI_LOCAL_PSTATE_WIDTH		4
+#define SIGI_LOCAL_PSTATE_MASK		((1 << SIGI_LOCAL_PSTATE_WIDTH) - 1)
 
 #define CACHE_WRITEBACK_SHIFT		6
 #define CACHE_WRITEBACK_GRANULE		(1 << CACHE_WRITEBACK_SHIFT)
 
+/* xlat table v2 related to contants */
 #define PLAT_PHY_ADDR_SPACE_SIZE	(1ULL << 40)
 #define PLAT_VIRT_ADDR_SPACE_SIZE	(1ULL << 40)
 #define MAX_XLAT_TABLES			8
@@ -46,15 +50,42 @@
 /* physical memory related constants */
 #define SIGI_INTERLEAVE_DRAM_BASE	0x1000000000UL
 #define SIGI_NON_INTER_DRAM_BASE	0x3000000000UL
+#define SIGI_NS_DDR_SIZE			(ULL(0x10) * SZ_1G)
 #define SIGI_BL33_IMAGE_OFFSET		0x4000000
 #define SIGI_BL33_DTB_OFFSET		0x2000000
 
 #define SIGI_OCM_BASE		0x04000000
 #define SIGI_OCM_SIZE		SZ_32M
 
-#define BL31_BASE			SIGI_OCM_BASE
-#define BL31_SIZE			SZ_512K
-#define BL31_LIMIT			(BL31_BASE + BL31_SIZE)
+/*
+ * ARM-TF lives in SRAM, partition it here
+ */
+
+#define SHARED_RAM_BASE			SIGI_OCM_BASE
+#define SHARED_RAM_SIZE			SZ_4K
+
+#define SEC_SRAM_BASE		(SHARED_RAM_BASE + SHARED_RAM_SIZE)
+#define SEC_SRAM_SIZE		SZ_512K
+
+#define PLAT_SIGI_TRUSTED_MAILBOX_BASE	SHARED_RAM_BASE
+#define PLAT_SIGI_TRUSTED_MAILBOX_SIZE	(8 + PLAT_SIGI_HOLD_SIZE)
+#define PLAT_SIGI_HOLD_BASE		(PLAT_SIGI_TRUSTED_MAILBOX_BASE + 8)
+#define PLAT_SIGI_HOLD_SIZE		(PLATFORM_CORE_COUNT * \
+					 PLAT_SIGI_HOLD_ENTRY_SIZE)
+#define PLAT_SIGI_HOLD_ENTRY_SHIFT	3
+#define PLAT_SIGI_HOLD_ENTRY_SIZE	(1 << PLAT_SIGI_HOLD_ENTRY_SHIFT)
+#define PLAT_SIGI_HOLD_STATE_WAIT	0
+#define PLAT_SIGI_HOLD_STATE_GO		1
+
+/*
+ * BL3-1 specific defines.
+ *
+ * Put BL3-1 at the top of the Trusted SRAM. BL31_BASE is calculated using the
+ * current BL3-1 debug size plus a little space for growth.
+ */
+#define BL31_BASE			SEC_SRAM_BASE
+#define BL31_SIZE			(BL31_LIMIT - BL31_BASE)
+#define BL31_LIMIT			(BL31_BASE + SZ_512K)
 
 #define BL32_BASE			(SIGI_OCM_BASE + BL31_SIZE)
 #define BL32_SIZE			SZ_1M
