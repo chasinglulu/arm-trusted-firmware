@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#define PLATFORM_NAME   "Horizon Robotics Journey 6 platform"
+#define PLATFORM_NAME   "hobot sigi virt platform"
 
 /* Clock configuration */
 #define SIGI_OSC24M_CLK_IN_HZ		24000000
