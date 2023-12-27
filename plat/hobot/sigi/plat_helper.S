@@ -23,7 +23,7 @@
 func sigi_calc_core_pos
 	and	x1, x0, #MPIDR_CPU_MASK
 	and	x0, x0, #MPIDR_CLUSTER_MASK
-	add	x0, x1, x0, lsr #7
+	add	x0, x1, x0, lsr #6
 	ret
 endfunc sigi_calc_core_pos
 

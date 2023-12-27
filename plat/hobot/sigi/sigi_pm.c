@@ -26,6 +26,8 @@ struct cpu_offset_map {
     {CPU_CL0_C1_0, 0x100},
     {CPU_CL0_C2_0, 0x200},
     {CPU_CL0_C3_0, 0x300},
+    {CPU_CL1_C0_0, 0x10000},
+    {CPU_CL1_C1_0, 0x10100},
 };
 
 /*

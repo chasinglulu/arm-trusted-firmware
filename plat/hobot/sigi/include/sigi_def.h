@@ -34,6 +34,10 @@ enum {
     CPU_CL0_C2_1            = 0x0230,
     CPU_CL0_C3_0            = 0x0238,
     CPU_CL0_C3_1            = 0x023c,
+    CPU_CL1_C0_0            = 0x0240,
+    CPU_CL1_C0_1            = 0x0244,
+    CPU_CL1_C1_0            = 0x0248,
+    CPU_CL1_C1_1            = 0x024c,
 };
 
 #define SIGI_PMU_BASE	0x23190000U
