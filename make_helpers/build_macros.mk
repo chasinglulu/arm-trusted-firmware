@@ -147,6 +147,12 @@ define IMG_BIN
     ${BUILD_PLAT}/$(1).bin
 endef
 
+# IMG_BIN_IMG defines the default image file corresponding to a BL stage
+#   $(1) = BL stage
+define IMG_BIN_IMG
+    ${BUILD_PLAT}/$(1).img
+endef
+
 # IMG_ENC_BIN defines the default encrypted image file corresponding to a
 # BL stage
 #   $(1) = BL stage
@@ -510,6 +516,7 @@ define MAKE_BL
         $(eval ELF        := $(call IMG_ELF,$(1)))
         $(eval DUMP       := $(call IMG_DUMP,$(1)))
         $(eval BIN        := $(call IMG_BIN,$(1)))
+        $(eval IMG        := $(call IMG_BIN_IMG,$(1)))
         $(eval ENC_BIN    := $(call IMG_ENC_BIN,$(1)))
         $(eval BL_LIBS    := $($(call uppercase,$(1))_LIBS))
 
@@ -600,11 +607,17 @@ $(BIN): $(ELF)
 	@echo "Built $$@ successfully"
 	@${ECHO_BLANK_LINE}
 
+$(IMG): $(BIN)
+	$${ECHO} "  MKIMAGE     $$@"
+	$$(Q)mkimage -A arm -T firmware -O arm-trusted-firmware -n "ATF" -d $$< $$@
+	@echo "Built $$@ successfully"
+	@${ECHO_BLANK_LINE}
+
 .PHONY: $(1)
 ifeq ($(DISABLE_BIN_GENERATION),1)
 $(1): $(ELF) $(DUMP)
 else
-$(1): $(BIN) $(DUMP)
+$(1): $(BIN) $(DUMP) $(IMG)
 endif
 
 all: $(1)
