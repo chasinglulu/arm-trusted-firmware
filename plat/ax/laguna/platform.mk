@@ -11,6 +11,10 @@ override USE_COHERENT_MEM		:= 0
 override SEPARATE_CODE_AND_RODATA	:= 1
 override HW_ASSISTED_COHERENCY := 1
 
+# Enable exception handling at EL3
+EL3_EXCEPTION_HANDLING	:=	1
+GICV2_G0_FOR_EL3	:=	1
+
 AX_PLAT        := plat/ax
 AX_PLAT_SOC    := ${AX_PLAT}/${PLAT}
 
@@ -40,6 +44,7 @@ BL31_SOURCES += ${LUA_GIC_SOURCES}                        \
 			${AX_PLAT_SOC}/lua_topology.c                 \
 			${AX_PLAT_SOC}/lua_pm.c                       \
 			${AX_PLAT_SOC}/lua_console.c                  \
-			${AX_PLAT_SOC}/lua_gic.c
+			${AX_PLAT_SOC}/lua_gic.c                      \
+			${AX_PLAT_SOC}/lua_ehf.c
 
 include lib/libfdt/libfdt.mk
