@@ -373,3 +373,8 @@ ENABLE_CONSOLE_GETC		:= 0
 # functions must be enabled by platforms if they require it.
 # Disabled by default.
 INIT_UNUSED_NS_EL2		:= 0
+
+#
+# By default, Laguna UART1 used for console.
+# UART1 IRQ is configured as non-secure
+ENABLE_SEC_UART			:= 0

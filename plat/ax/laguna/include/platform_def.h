@@ -92,19 +92,47 @@
 # define PLAT_ARM_NS_IMAGE_BASE  U(PRELOADED_BL33_BASE)
 #endif
 
+/* Clock configuration */
+#ifdef LUA_FPGA
+#define LUA_OSC24M_CLK_IN_HZ       10000000
+#else
+#define LUA_OSC24M_CLK_IN_HZ       24000000
+#endif
+
+/* UART configuration */
+#define LUA_UART_BAUDRATE         115200
+#define LUA_UART_CLK_IN_HZ        LUA_OSC24M_CLK_IN_HZ
+
 /*
  * UART related constants
  */
-#define PLAT_LUA_BOOT_UART_BASE         0x0E403000
-#define PLAT_LUA_BOOT_UART_CLK_IN_HZ    LUA_UART0_CLK_IN_HZ
-#define PLAT_LUA_CONSOLE_BAUDRATE       LUA_UART0_BAUDRATE
+#define PLAT_PRI_BITS                   U(3)
 
-#define PLAT_LUA_UART1_BASE             PLAT_LUA_BOOT_UART_BASE
+#define PLAT_LUA_UART0_BASE             0x00602000
+#define PLAT_LUA_UART0_SIZE             ULL(0x1000)
+#define PLAT_LUA_UART0_MMAP             MAP_REGION_FLAT(PLAT_LUA_UART0_BASE,   \
+											PLAT_LUA_UART0_SIZE,               \
+											MT_DEVICE | MT_RW |                \
+											MT_NS | MT_PRIVILEGED)
+
+#define PLAT_LUA_UART1_PRIO             U(0x40)
+#define PLAT_LUA_UART1_IRQ              U(196)
+#define PLAT_LUA_UART1_BASE             0x0E403000
 #define PLAT_LUA_UART1_SIZE             ULL(0x1000)
 #define PLAT_LUA_UART1_MMAP             MAP_REGION_FLAT(PLAT_LUA_UART1_BASE,   \
 											PLAT_LUA_UART1_SIZE,               \
 											MT_DEVICE | MT_RW |                \
 											MT_NS | MT_PRIVILEGED)
+
+#ifdef LUA_UART0_CONSOLE
+#define PLAT_LUA_BOOT_UART_BASE         PLAT_LUA_UART0_BASE
+#define PLAT_LUA_BOOT_MMAP              PLAT_LUA_UART0_MMAP
+#else
+#define PLAT_LUA_BOOT_UART_BASE         PLAT_LUA_UART1_BASE
+#define PLAT_LUA_BOOT_MMAP              PLAT_LUA_UART1_MMAP
+#endif
+#define PLAT_LUA_BOOT_UART_CLK_IN_HZ    LUA_UART_CLK_IN_HZ
+#define PLAT_LUA_CONSOLE_BAUDRATE       LUA_UART_BAUDRATE
 
 #define DEVICE_BASE            0x04000000
 #define DEVICE_SIZE            SZ_512M
@@ -142,7 +170,9 @@
 	INTR_PROP_DESC(LUA_IRQ_SEC_SGI_7, GIC_HIGHEST_SEC_PRIORITY,     \
 					   grp, GIC_INTR_CFG_EDGE)
 
-#define PLATFORM_G0_PROPS(grp)
+#define PLATFORM_UART1_G0_PROPS(grp)                                \
+	INTR_PROP_DESC(PLAT_LUA_UART1_IRQ, PLAT_LUA_UART1_PRIO,         \
+	                   grp, GIC_INTR_CFG_LEVEL)
 
 #define PLAT_LUA_PRIMARY_CPU                  0x0
 #define PLAT_LUA_PRIMARY_CPU_SHIFT            8

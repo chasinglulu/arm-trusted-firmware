@@ -31,6 +31,7 @@ const mmap_region_t plat_lua_mmap[] = {
 	MAP_REGION_FLAT(DEVICE_BASE, DEVICE_SIZE, MT_DEVICE | MT_RW | MT_NS),
 	MAP_REGION_FLAT(GICD_BASE, 0x8000, MT_DEVICE | MT_RW | MT_SECURE),
 	MAP_REGION_FLAT(LUA_PMU_BASE, 0x1000, MT_DEVICE | MT_RW | MT_SECURE),
+	PLAT_LUA_BOOT_MMAP,
 	{ 0 }
 };
 
@@ -125,6 +126,21 @@ void bl31_early_platform_setup2(u_register_t arg0, u_register_t arg1,
 	NOTICE("BL31: Non secure code at 0x%08lx\n", bl33_image_ep_info.pc);
 }
 
+#ifdef LUA_SEC_UART1_IRQ
+static int uart1_interrupt_handler(uint32_t intr_raw, uint32_t flags,
+		void *handle, void *cookie)
+{
+	NOTICE("An UART1 interrupt is taken from non-secure EL1/EL2 to EL3.\n");
+
+	/* Disable all interrupts */
+	mmio_write_32(PLAT_LUA_UART1_BASE + UARTIER, 0x0);
+
+	plat_ic_end_of_interrupt(intr_raw);
+
+	return 0;
+}
+#endif
+
 /*******************************************************************************
  * Perform any BL3-1 platform setup code
  ******************************************************************************/
@@ -132,6 +148,11 @@ void bl31_platform_setup(void)
 {
 	/* Initialize the gic cpu and distributor interfaces */
 	plat_lua_gic_init();
+
+#ifdef LUA_SEC_UART1_IRQ
+	ehf_register_priority_handler(PLAT_LUA_UART1_PRIO,
+				uart1_interrupt_handler);
+#endif
 }
 
 /*******************************************************************************

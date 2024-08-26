@@ -9,13 +9,6 @@
 
 #define PLATFORM_NAME   "Laguna Virtual Platform"
 
-/* Clock configuration */
-#define LUA_OSC24M_CLK_IN_HZ       24000000
-
-/* UART configuration */
-#define LUA_UART0_BAUDRATE         115200
-#define LUA_UART0_CLK_IN_HZ        LUA_OSC24M_CLK_IN_HZ
-
 unsigned int lua_calc_core_pos(u_register_t mpidr);
 void lua_console_init(void);
 void plat_lua_gic_init(void);

@@ -10,7 +10,9 @@
 
 static const interrupt_prop_t lua_interrupt_props[] = {
 	PLATFORM_G1S_PROPS(GICV2_INTR_GROUP0),
-	PLATFORM_G0_PROPS(GICV2_INTR_GROUP0)
+#if LUA_SEC_UART1_IRQ
+	PLATFORM_UART1_G0_PROPS(GICV2_INTR_GROUP0)
+#endif
 };
 
 static const struct gicv2_driver_data plat_gicv2_driver_data = {

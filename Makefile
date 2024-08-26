@@ -1237,6 +1237,7 @@ $(eval $(call assert_booleans,\
 	PSA_CRYPTO	\
 	ENABLE_CONSOLE_GETC \
 	INIT_UNUSED_NS_EL2	\
+	ENABLE_SEC_UART	\
 )))
 
 # Numeric_Flags
@@ -1454,6 +1455,15 @@ endif
 
 ifneq ($(findstring armlink,$(notdir $(LD))),)
         $(eval $(call add_define,USE_ARM_LINK))
+endif
+
+ifeq (${ENABLE_SEC_UART},1)
+        $(eval $(call add_define,LUA_UART0_CONSOLE))
+        $(eval $(call add_define,LUA_SEC_UART1_IRQ))
+endif
+
+ifeq (${FPGA},1)
+        $(eval $(call add_define,LUA_FPGA))
 endif
 
 # Generate and include sp_gen.mk if SPD is spmd and SP_LAYOUT_FILE is defined
