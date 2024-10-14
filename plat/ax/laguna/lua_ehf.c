@@ -10,6 +10,9 @@
 
 ehf_pri_desc_t lua_exceptions[] = {
 	EHF_PRI_DESC(PLAT_PRI_BITS, PLAT_LUA_UART1_PRIO),
+#if ENABLE_FEAT_RAS && FFH_SUPPORT
+	EHF_PRI_DESC(PLAT_PRI_BITS, PLAT_RAS_PRI),
+#endif
 };
 
 /* Plug in ARM exceptions to Exception Handling Framework. */

@@ -15,6 +15,10 @@ override HW_ASSISTED_COHERENCY := 1
 EL3_EXCEPTION_HANDLING	:= 1
 GICV2_G0_FOR_EL3	:= 1
 
+# RAS options
+ENABLE_FEAT_RAS	:= 1
+HANDLE_EA_EL3_FIRST_NS	:= 1
+
 CRASH_REPORTING	:= 1
 ENABLE_ASSERTIONS	:= 1
 
@@ -47,6 +51,13 @@ BL31_SOURCES += ${LUA_GIC_SOURCES}                        \
 			${AX_PLAT_SOC}/lua_pm.c                       \
 			${AX_PLAT_SOC}/lua_console.c                  \
 			${AX_PLAT_SOC}/lua_gic.c                      \
-			${AX_PLAT_SOC}/lua_ehf.c
+			${AX_PLAT_SOC}/lua_ehf.c                      \
+			${AX_PLAT_SOC}/lua_ras.c
+
+# RAS sources
+ifeq (${ENABLE_FEAT_RAS}-${HANDLE_EA_EL3_FIRST_NS},1-1)
+BL31_SOURCES += lib/extensions/ras/std_err_record.c       \
+				lib/extensions/ras/ras_common.c
+endif
 
 include lib/libfdt/libfdt.mk

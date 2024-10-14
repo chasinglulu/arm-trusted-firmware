@@ -18,6 +18,7 @@
 #include <lib/mmio.h>
 #include <plat/common/platform.h>
 #include <plat/arm/common/plat_arm.h>
+#include <lib/extensions/ras.h>
 
 static entry_point_info_t bl32_image_ep_info;
 static entry_point_info_t bl33_image_ep_info;
@@ -152,6 +153,10 @@ void bl31_platform_setup(void)
 #ifdef LUA_SEC_UART1_IRQ
 	ehf_register_priority_handler(PLAT_LUA_UART1_PRIO,
 				uart1_interrupt_handler);
+#endif
+
+#if ENABLE_FEAT_RAS && FFH_SUPPORT
+	ras_init();
 #endif
 }
 

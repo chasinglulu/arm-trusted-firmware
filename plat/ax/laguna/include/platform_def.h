@@ -10,6 +10,19 @@
 #include <lib/utils_def.h>
 #include <plat/common/common_def.h>
 
+/* RAS */
+#define PLAT_RAS_PRI               U(0x10)
+#define PLAT_LUA_DSU_ERRIRQ        U(33)
+#define PLAT_LUA_DSU_FAULTIRQ      U(34)
+#define PLAT_LUA_CPU0_ERRIRQ       U(39)
+#define PLAT_LUA_CPU0_FAULTIRQ     U(43)
+#define PLAT_LUA_CPU1_ERRIRQ       U(40)
+#define PLAT_LUA_CPU1_FAULTIRQ     U(44)
+#define PLAT_LUA_CPU2_ERRIRQ       U(41)
+#define PLAT_LUA_CPU2_FAULTIRQ     U(45)
+#define PLAT_LUA_CPU3_ERRIRQ       U(42)
+#define PLAT_LUA_CPU3_FAULTIRQ     U(46)
+
 /* CPU topology */
 #define PLAT_MAX_CORES_PER_CLUSTER    U(4)
 #define PLAT_CLUSTER_COUNT            U(1)
@@ -173,6 +186,28 @@
 #define PLATFORM_UART1_G0_PROPS(grp)                                \
 	INTR_PROP_DESC(PLAT_LUA_UART1_IRQ, PLAT_LUA_UART1_PRIO,         \
 	                   grp, GIC_INTR_CFG_LEVEL)
+
+#define PLATFORM_RAS_G0_PROPS(grp)                                  \
+	INTR_PROP_DESC(PLAT_LUA_DSU_ERRIRQ, PLAT_RAS_PRI,               \
+	                   grp, GIC_INTR_CFG_EDGE),                     \
+	INTR_PROP_DESC(PLAT_LUA_DSU_FAULTIRQ, PLAT_RAS_PRI,             \
+	                   grp, GIC_INTR_CFG_EDGE),                     \
+	INTR_PROP_DESC(PLAT_LUA_CPU0_ERRIRQ, PLAT_RAS_PRI,              \
+	                   grp, GIC_INTR_CFG_EDGE),                     \
+	INTR_PROP_DESC(PLAT_LUA_CPU0_FAULTIRQ, PLAT_RAS_PRI,            \
+	                   grp, GIC_INTR_CFG_EDGE),                     \
+	INTR_PROP_DESC(PLAT_LUA_CPU1_ERRIRQ, PLAT_RAS_PRI,              \
+	                   grp, GIC_INTR_CFG_EDGE),                     \
+	INTR_PROP_DESC(PLAT_LUA_CPU1_FAULTIRQ, PLAT_RAS_PRI,            \
+	                   grp, GIC_INTR_CFG_EDGE),                     \
+	INTR_PROP_DESC(PLAT_LUA_CPU2_ERRIRQ, PLAT_RAS_PRI,              \
+	                   grp, GIC_INTR_CFG_EDGE),                     \
+	INTR_PROP_DESC(PLAT_LUA_CPU2_FAULTIRQ, PLAT_RAS_PRI,            \
+	                   grp, GIC_INTR_CFG_EDGE),                     \
+	INTR_PROP_DESC(PLAT_LUA_CPU3_ERRIRQ, PLAT_RAS_PRI,              \
+	                   grp, GIC_INTR_CFG_EDGE),                     \
+	INTR_PROP_DESC(PLAT_LUA_CPU3_FAULTIRQ, PLAT_RAS_PRI,            \
+	                   grp, GIC_INTR_CFG_EDGE)
 
 #define PLAT_LUA_PRIMARY_CPU                  0x0
 #define PLAT_LUA_PRIMARY_CPU_SHIFT            8
