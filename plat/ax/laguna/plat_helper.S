@@ -9,12 +9,48 @@
 #include <assert_macros.S>
 #include <platform_def.h>
 
-	.global	lua_calc_core_pos
-	.global	plat_my_core_pos
-	.global	platform_mem_init
-	.global	plat_is_my_cpu_primary
+	.global lua_calc_core_pos
+	.global plat_my_core_pos
+	.global platform_mem_init
+	.global plat_is_my_cpu_primary
 	.global plat_secondary_cold_boot_setup
-	.globl  plat_get_my_entrypoint
+	.global plat_get_my_entrypoint
+	.global plat_crash_console_init
+	.global plat_crash_console_putc
+	.global plat_crash_console_flush
+	.global plat_report_exception
+	.global plat_panic_handler
+
+.section .rodata.plat_prints, "aS"
+panic_handler_msg:
+	.asciz "[PANIC HANDLER] Loop in EL3.\n"
+
+func plat_crash_console_init
+	mov_imm x0, PLAT_LUA_BOOT_UART_BASE
+	mov_imm x1, PLAT_LUA_BOOT_UART_CLK_IN_HZ
+	mov_imm x2, PLAT_LUA_CONSOLE_BAUDRATE
+	b	console_16550_core_init
+endfunc plat_crash_console_init
+
+func plat_crash_console_putc
+	mov_imm x1, PLAT_LUA_BOOT_UART_BASE
+	b	console_16550_core_putc
+endfunc plat_crash_console_putc
+
+func plat_crash_console_flush
+	ret
+endfunc plat_crash_console_flush
+
+func plat_report_exception
+	ret
+endfunc plat_report_exception
+
+func plat_panic_handler
+	adr	x4, panic_handler_msg
+	bl	asm_print_str
+	wfi
+	b	plat_panic_handler
+endfunc plat_panic_handler
 
 /*
  * unsigned int lua_calc_core_pos(u_register_t mpidr)

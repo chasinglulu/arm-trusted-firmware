@@ -12,8 +12,11 @@ override SEPARATE_CODE_AND_RODATA	:= 1
 override HW_ASSISTED_COHERENCY := 1
 
 # Enable exception handling at EL3
-EL3_EXCEPTION_HANDLING	:=	1
-GICV2_G0_FOR_EL3	:=	1
+EL3_EXCEPTION_HANDLING	:= 1
+GICV2_G0_FOR_EL3	:= 1
+
+CRASH_REPORTING	:= 1
+ENABLE_ASSERTIONS	:= 1
 
 AX_PLAT        := plat/ax
 AX_PLAT_SOC    := ${AX_PLAT}/${PLAT}
@@ -28,7 +31,6 @@ LUA_GIC_SOURCES := ${GICV2_SOURCES}
 
 PLAT_BL_COMMON_SOURCES := common/desc_image_load.c            \
 				lib/bl_aux_params/bl_aux_params.c             \
-				plat/common/aarch64/crash_console_helpers.S   \
 				plat/common/plat_gicv2.c                      \
 				plat/common/plat_psci_common.c                \
 				plat/arm/common/arm_common.c                  \
