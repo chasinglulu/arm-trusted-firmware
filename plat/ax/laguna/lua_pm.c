@@ -18,20 +18,6 @@
 #include <lib/el3_runtime/context_mgmt.h>
 #include <lib/mmio.h>
 
-struct cpu_offset_map {
-    uint64_t offset;
-    u_register_t cpu_idx;
-} cpu_map [] = {
-    {CPU_CL0_C0_0, 0x000},
-    {CPU_CL0_C1_0, 0x100},
-    {CPU_CL0_C2_0, 0x200},
-    {CPU_CL0_C3_0, 0x300},
-    {CPU_CL1_C0_0, 0x10000},
-    {CPU_CL1_C1_0, 0x10100},
-    {CPU_CL1_C2_0, 0x10200},
-    {CPU_CL1_C3_0, 0x10300},
-};
-
 /*
  * The secure entry point to be used on warm reset.
  */
@@ -167,18 +153,6 @@ void lua_cpu_standby(plat_local_state_t cpu_state)
 	wfi();
 }
 
-static uint64_t get_offset_addr_by_mpidr(u_register_t mpidr)
-{
-	int i;
-
-	for (i = 0; i < ARRAY_SIZE(cpu_map); i++) {
-		if (cpu_map[i].cpu_idx == mpidr)
-			return cpu_map[i].offset;
-	}
-
-	return ULONG_MAX;
-}
-
 /**
  * lua_pwr_domain_on() -	Power on a cpu.
  *
@@ -193,12 +167,20 @@ static int lua_pwr_domain_on(u_register_t mpidr)
 	int rc = PSCI_E_SUCCESS;
 	unsigned pos = plat_core_pos_by_mpidr(mpidr);
 	uint64_t *hold_base = (uint64_t *)PLAT_LUA_HOLD_BASE;
-	uint64_t offset = get_offset_addr_by_mpidr(mpidr);
+	uint64_t addr = CPU_SYSCTL_BASE + CA55_CORE_SW_RST_OFFSET;
+	uint64_t rvbar_addr = addr + 8;
+	uint32_t low = (uint32_t)secure_entrypoint;
+	uint32_t high = (uint32_t)(secure_entrypoint >> 32);
+
+	assert(pos < PLATFORM_CORE_COUNT);
 
 	hold_base[pos] = PLAT_LUA_HOLD_STATE_GO;
 	sev();
 
-	mmio_setbits_32(LUA_PMU_BASE + offset, BIT(12));
+	mmio_write_32(rvbar_addr + pos * 8, low);
+	mmio_write_32(rvbar_addr + pos * 8 + 4, high);
+
+	mmio_clrbits_32(addr, BIT(pos));
 
 	return rc;
 }

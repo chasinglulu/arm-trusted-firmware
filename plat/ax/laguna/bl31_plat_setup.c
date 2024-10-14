@@ -30,8 +30,8 @@ static entry_point_info_t bl33_image_ep_info;
  */
 const mmap_region_t plat_lua_mmap[] = {
 	MAP_REGION_FLAT(DEVICE_BASE, DEVICE_SIZE, MT_DEVICE | MT_RW | MT_NS),
-	MAP_REGION_FLAT(GICD_BASE, 0x8000, MT_DEVICE | MT_RW | MT_SECURE),
-	MAP_REGION_FLAT(LUA_PMU_BASE, 0x1000, MT_DEVICE | MT_RW | MT_SECURE),
+	MAP_REGION_FLAT(GICD_BASE, GICD_SIZE, MT_DEVICE | MT_RW | MT_SECURE),
+	MAP_REGION_FLAT(CPU_SYSCTL_BASE, CPU_SYSCTL_SIZE, MT_DEVICE | MT_RW | MT_NS),
 	PLAT_LUA_BOOT_MMAP,
 	{ 0 }
 };
@@ -75,8 +75,7 @@ static inline void bl31_set_default_config(void)
 	bl32_image_ep_info.pc = (uintptr_t)BL32_BASE;
 	bl32_image_ep_info.spsr = (uint32_t)arm_get_spsr_for_bl32_entry();
 	bl33_image_ep_info.pc = (uintptr_t)plat_get_ns_image_entrypoint();
-	bl33_image_ep_info.spsr = (uint32_t)SPSR_64(MODE_EL2, MODE_SP_ELX,
-						    DISABLE_ALL_EXCEPTIONS);
+	bl33_image_ep_info.spsr = (uint32_t)SPSR_64(MODE_EL2, MODE_SP_ELX, DISABLE_ALL_EXCEPTIONS);
 }
 
 static void lua_print_platform_name(void)

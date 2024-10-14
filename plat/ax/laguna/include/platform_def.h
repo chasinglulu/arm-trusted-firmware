@@ -23,6 +23,10 @@
 #define PLAT_LUA_CPU3_ERRIRQ       U(42)
 #define PLAT_LUA_CPU3_FAULTIRQ     U(46)
 
+/* SDEI */
+#define PLAT_SDEI_CRITICAL_PRI     U(0x20)
+#define PLAT_SDEI_NORMAL_PRI       U(0x30)
+
 /* CPU topology */
 #define PLAT_MAX_CORES_PER_CLUSTER    U(4)
 #define PLAT_CLUSTER_COUNT            U(1)
@@ -56,7 +60,7 @@
 #define PLAT_PHY_ADDR_SPACE_SIZE    (1ULL << 40)
 #define PLAT_VIRT_ADDR_SPACE_SIZE   (1ULL << 40)
 #define MAX_XLAT_TABLES             U(8)
-#define MAX_MMAP_REGIONS            U(8)
+#define MAX_MMAP_REGIONS            U(16)
 
 #define PLATFORM_STACK_SIZE         (1UL << 12)
 
@@ -70,12 +74,12 @@
 #define LUA_IRAM_BASE                0x00400000
 #define LUA_IRAM_SIZE                SZ_64K
 
-#define SHARED_RAM_BASE         (LUA_IRAM_BASE + LUA_IRAM_SIZE - SZ_4K)
-#define SHARED_RAM_SIZE         SZ_4K
+#define SHARED_RAM_BASE              (LUA_DRAM_BASE + SZ_1M)
+#define SHARED_RAM_SIZE              SZ_4K
 
 #define PLAT_LUA_TRUSTED_MAILBOX_BASE    SHARED_RAM_BASE
 #define PLAT_LUA_TRUSTED_MAILBOX_SIZE    (8 + PLAT_LUA_HOLD_SIZE)
-#define PLAT_LUA_HOLD_BASE               (PLAT_LUA_TRUSTED_MAILBOX_BASE + 8)
+#define PLAT_LUA_HOLD_BASE               (SHARED_RAM_BASE + 8)
 #define PLAT_LUA_HOLD_SIZE               (PLATFORM_CORE_COUNT * PLAT_LUA_HOLD_ENTRY_SIZE)
 #define PLAT_LUA_HOLD_ENTRY_SHIFT        U(3)
 #define PLAT_LUA_HOLD_ENTRY_SIZE         (1 << PLAT_LUA_HOLD_ENTRY_SHIFT)
@@ -150,20 +154,27 @@
 #define DEVICE_BASE            0x04000000
 #define DEVICE_SIZE            SZ_512M
 
+#define CPU_SYSCTL_BASE             0x08010000
+#define CPU_SYSCTL_SIZE             0x1000
+#define CA55_CORE_SW_RST_OFFSET     0xE0
+
 /*
  * GIC related constants
  */
 #define GICD_BASE               0x08001000
+#define GICD_SIZE               0x8000
 #define GICC_BASE               0x08002000
 
-#define LUA_IRQ_SEC_SGI_0       8
-#define LUA_IRQ_SEC_SGI_1       9
-#define LUA_IRQ_SEC_SGI_2       10
-#define LUA_IRQ_SEC_SGI_3       11
-#define LUA_IRQ_SEC_SGI_4       12
-#define LUA_IRQ_SEC_SGI_5       13
-#define LUA_IRQ_SEC_SGI_6       14
-#define LUA_IRQ_SEC_SGI_7       15
+#define LUA_SDEI_SGI_PRIVATE    LUA_IRQ_SEC_SGI_0
+
+#define LUA_IRQ_SEC_SGI_0       U(8)
+#define LUA_IRQ_SEC_SGI_1       U(9)
+#define LUA_IRQ_SEC_SGI_2       U(10)
+#define LUA_IRQ_SEC_SGI_3       U(11)
+#define LUA_IRQ_SEC_SGI_4       U(12)
+#define LUA_IRQ_SEC_SGI_5       U(13)
+#define LUA_IRQ_SEC_SGI_6       U(14)
+#define LUA_IRQ_SEC_SGI_7       U(15)
 
 #define PLATFORM_G1S_PROPS(grp)                                     \
 	INTR_PROP_DESC(LUA_IRQ_SEC_SGI_0, GIC_HIGHEST_SEC_PRIORITY,     \
