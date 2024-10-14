@@ -19,6 +19,8 @@ GICV2_G0_FOR_EL3	:= 1
 ENABLE_FEAT_RAS	:= 1
 HANDLE_EA_EL3_FIRST_NS	:= 1
 
+SDEI_SUPPORT	:= 1
+
 CRASH_REPORTING	:= 1
 ENABLE_ASSERTIONS	:= 1
 
@@ -52,7 +54,8 @@ BL31_SOURCES += ${LUA_GIC_SOURCES}                        \
 			${AX_PLAT_SOC}/lua_console.c                  \
 			${AX_PLAT_SOC}/lua_gic.c                      \
 			${AX_PLAT_SOC}/lua_ehf.c                      \
-			${AX_PLAT_SOC}/lua_ras.c
+			${AX_PLAT_SOC}/lua_ras.c                      \
+			${AX_PLAT_SOC}/lua_sdei.c
 
 # RAS sources
 ifeq (${ENABLE_FEAT_RAS}-${HANDLE_EA_EL3_FIRST_NS},1-1)
