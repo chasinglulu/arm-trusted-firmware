@@ -5,7 +5,7 @@
 # All rights reserved.
 #
 
-override RESET_TO_BL31	:= 1
+override RESET_TO_BL31	:= 0
 override CTX_INCLUDE_AARCH32_REGS := 0
 override USE_COHERENT_MEM		:= 0
 override SEPARATE_CODE_AND_RODATA	:= 1
@@ -23,6 +23,10 @@ SDEI_SUPPORT	:= 1
 
 CRASH_REPORTING	:= 1
 ENABLE_ASSERTIONS	:= 1
+
+INIT_UNUSED_NS_EL2	:= 1
+ERRATA_A55_1530923	:= 1
+ARM_ARCH_MINOR	:= 2
 
 AX_PLAT        := plat/ax
 AX_PLAT_SOC    := ${AX_PLAT}/${PLAT}
