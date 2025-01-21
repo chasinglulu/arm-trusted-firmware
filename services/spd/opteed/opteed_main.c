@@ -73,7 +73,8 @@ uint64_t dual32to64(uint32_t high, uint32_t low)
  * OPTEED. It validates the interrupt and upon success arranges entry into
  * the OPTEE at 'optee_fiq_entry()' for handling the interrupt.
  ******************************************************************************/
-static uint64_t opteed_sel1_interrupt_handler(uint32_t id,
+static __attribute__((__unused__))
+uint64_t opteed_sel1_interrupt_handler(uint32_t id,
 					    uint32_t flags,
 					    void *handle,
 					    void *cookie)
@@ -433,7 +434,7 @@ static uintptr_t opteed_smc_handler(uint32_t smc_fid,
 	cpu_context_t *ns_cpu_context;
 	uint32_t linear_id = plat_my_core_pos();
 	optee_context_t *optee_ctx = &opteed_sp_context[linear_id];
-	uint64_t rc;
+	uint64_t __attribute__((__unused__)) rc;
 
 	/*
 	 * Determine which security state this SMC originated from
@@ -567,6 +568,13 @@ static uintptr_t opteed_smc_handler(uint32_t smc_fid,
 			 */
 			psci_register_spd_pm_hook(&opteed_pm);
 
+			/* On GICv2 systems, it's required that the build option
+			 * GICV2_G0_FOR_EL3 is set to 1 so that Group 0 interrupts
+			 * target EL3.
+			 * This option determines which type Group0 interrupts maps to,
+			 * (INTR_TYPE_S_EL1 or INTR_TYPE_EL3)
+			 */
+#if (GICV2_G0_FOR_EL3 == 0)
 			/*
 			 * Register an interrupt handler for S-EL1 interrupts
 			 * when generated during code executing in the
@@ -579,6 +587,7 @@ static uintptr_t opteed_smc_handler(uint32_t smc_fid,
 						flags);
 			if (rc)
 				panic();
+#endif
 		}
 
 		/*
