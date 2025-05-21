@@ -118,7 +118,11 @@
 
 /* UART configuration */
 #define LUA_UART_BAUDRATE         115200
+#ifdef LUA_UART0_CONSOLE
+#define LUA_UART_CLK_IN_HZ        U(200000000)
+#else
 #define LUA_UART_CLK_IN_HZ        LUA_OSC24M_CLK_IN_HZ
+#endif
 
 /*
  * UART related constants
