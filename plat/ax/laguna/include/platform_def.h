@@ -36,6 +36,13 @@
 #define PLAT_MAX_RET_STATE      U(1)
 #define PLAT_MAX_OFF_STATE      U(2)
 
+#define PLAT_LUA_FAB_PERIPH_PRIO   U(0x50)
+#define PLAT_LUA_FAB_PERIPH_IRQ    U(179 + 32)
+
+#define PLATFORM_FAB_PERIPH_G0_PROPS(grp)                                     \
+	INTR_PROP_DESC(PLAT_LUA_FAB_PERIPH_IRQ, PLAT_LUA_FAB_PERIPH_PRIO,         \
+	                   grp, GIC_INTR_CFG_LEVEL)
+
 /* Local power state for power domains in Run state. */
 #define LUA_LOCAL_STATE_RUN     U(0)
 /* Local power state for retention. Valid only for CPU power domains */

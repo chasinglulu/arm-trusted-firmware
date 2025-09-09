@@ -141,6 +141,24 @@ static int uart1_interrupt_handler(uint32_t intr_raw, uint32_t flags,
 }
 #endif
 
+#define PERIPH_GLB_BASE       U(0x0E000000)
+static int fab_periph_interrupt_handler(uint32_t intr_raw, uint32_t flags,
+		void *handle, void *cookie)
+{
+	NOTICE("An fab_periph (%d) interrupt is taken from non-secure EL1/EL2 to EL3.\n", intr_raw);
+
+	uint32_t fab_periph_irq = mmio_read_32(PERIPH_GLB_BASE + 0x24);
+	INFO("fab_periph_irq status = %x\n", fab_periph_irq);
+
+	/* Clear fab_periph interrupt */
+	mmio_write_32(PERIPH_GLB_BASE + 0x14, BIT(0));
+	mmio_write_32(PERIPH_GLB_BASE + 0x20, BIT(0));
+
+	plat_ic_end_of_interrupt(intr_raw);
+
+	return 0;
+}
+
 /*******************************************************************************
  * Perform any BL3-1 platform setup code
  ******************************************************************************/
@@ -153,6 +171,9 @@ void bl31_platform_setup(void)
 	ehf_register_priority_handler(PLAT_LUA_UART1_PRIO,
 				uart1_interrupt_handler);
 #endif
+
+	ehf_register_priority_handler(PLAT_LUA_FAB_PERIPH_PRIO,
+				fab_periph_interrupt_handler);
 
 #if ENABLE_FEAT_RAS && FFH_SUPPORT
 	ras_init();
