@@ -62,7 +62,7 @@ static int injected_fault_handler(const struct err_record_info *info,
 	write_erxstatus_el1(status);
 	plat_ic_end_of_interrupt(intr);
 
-	// ret = sdei_dispatch_event(5000);
+	// ret = sdei_dispatch_event(5001);
 	// if (ret < 0) {
 	// 	ERROR("Can't dispatch event to SDEI\n");
 	// 	panic();

@@ -24,6 +24,7 @@ int arm_validate_ns_entrypoint(uintptr_t entrypoint)
 /* Private event mappings */
 static sdei_ev_map_t lua_sdei_private[] = {
 	SDEI_DEFINE_EVENT_0(LUA_SDEI_SGI_PRIVATE),
+	SDEI_EXPLICIT_EVENT(5001, SDEI_MAPF_NORMAL),
 };
 
 /* Shared event mappings */

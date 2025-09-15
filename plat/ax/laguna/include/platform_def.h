@@ -124,7 +124,7 @@
 #endif
 
 /* UART configuration */
-#define LUA_UART_BAUDRATE         115200
+#define LUA_UART_BAUDRATE         921600
 #ifdef LUA_UART0_CONSOLE
 #define LUA_UART_CLK_IN_HZ        U(200000000)
 #else
